@@ -35,6 +35,10 @@
       <mat-label>Job title</mat-label>
       <input matInput formControlName="jobTitle" />
     </mat-form-field>
+    <button class="clear-filters" mat-stroked-button type="button" (click)="clearFilters()">
+      <mat-icon aria-hidden="true">clear_all</mat-icon>
+      <span>Clear Filters</span>
+    </button>
   </form>
 </mat-card>
 
@@ -67,7 +71,7 @@
 @if (!loading() && !error() && employees().length > 0) {
   <mat-card appearance="outlined" class="table-card">
     <div class="table-wrapper">
-      <table mat-table [dataSource]="employees()" matSort matSortActive="lastName" matSortDirection="asc" (matSortChange)="onSortChange($event)">
+      <table mat-table [dataSource]="employees()" matSort [matSortActive]="sortField()" [matSortDirection]="sortDirection()" (matSortChange)="onSortChange($event)">
         <ng-container matColumnDef="employeeCode">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="employeeCode">Employee Code</th>
           <td mat-cell *matCellDef="let employee">{{ employee.employeeCode }}</td>

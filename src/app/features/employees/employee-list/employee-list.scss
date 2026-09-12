@@ -30,6 +30,7 @@ td:last-child, th:last-child { width: 7rem; }
 .filters-card { background: var(--acme-white); box-shadow: 0 6px 20px rgb(24 59 86 / 4%); }
 .filters-card form { align-items: start; }
 .filters-card mat-form-field { width: 100%; }
+.clear-filters { grid-column: 1 / -1; justify-self: end; margin-bottom: 1rem; }
 .table-card { background: var(--acme-white); box-shadow: 0 6px 20px rgb(24 59 86 / 4%); }
 tr.mat-mdc-row { transition: background-color 120ms ease; }
 tr.mat-mdc-row:hover { background: #eaf8f5; }

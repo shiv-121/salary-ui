@@ -4,12 +4,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subject, catchError, finalize, forkJoin, of, switchMap } from 'rxjs';
 
 import { CompensationBreakdown, CompensationSummary } from '../../core/models/analytics.model';
+import { Currency, SUPPORTED_CURRENCIES } from '../../core/models/salary.model';
 import { AnalyticsService } from '../../core/services/analytics.service';
 
 @Component({
@@ -19,8 +22,10 @@ import { AnalyticsService } from '../../core/services/analytics.service';
     DecimalPipe,
     MatButtonModule,
     MatCardModule,
+    MatFormFieldModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSelectModule,
     MatTableModule,
     RouterLink
   ],
@@ -29,11 +34,14 @@ import { AnalyticsService } from '../../core/services/analytics.service';
 })
 export class Dashboard {
   private readonly analyticsService = inject(AnalyticsService);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly refreshSubject = new Subject<void>();
 
   readonly summary = signal<CompensationSummary | null>(null);
   readonly reportingCurrency = signal<string | null>(null);
+  readonly selectedReportingCurrency = signal<Currency>('USD');
+  readonly currencies = SUPPORTED_CURRENCIES;
   readonly countries = signal<CompensationBreakdown[]>([]);
   readonly departments = signal<CompensationBreakdown[]>([]);
   readonly jobTitles = signal<CompensationBreakdown[]>([]);
@@ -55,25 +63,25 @@ export class Dashboard {
           this.jobTitleError.set(false);
 
           return forkJoin({
-            summary: this.analyticsService.getSummary().pipe(
+            summary: this.analyticsService.getSummary(this.selectedReportingCurrency()).pipe(
               catchError(() => {
                 this.summaryError.set(true);
                 return of(null);
               })
             ),
-            countries: this.analyticsService.getByCountry().pipe(
+            countries: this.analyticsService.getByCountry(this.selectedReportingCurrency()).pipe(
               catchError(() => {
                 this.countryError.set(true);
                 return of<CompensationBreakdown[]>([]);
               })
             ),
-            departments: this.analyticsService.getByDepartment().pipe(
+            departments: this.analyticsService.getByDepartment(this.selectedReportingCurrency()).pipe(
               catchError(() => {
                 this.departmentError.set(true);
                 return of<CompensationBreakdown[]>([]);
               })
             ),
-            jobTitles: this.analyticsService.getByJobTitle().pipe(
+            jobTitles: this.analyticsService.getByJobTitle(this.selectedReportingCurrency()).pipe(
               catchError(() => {
                 this.jobTitleError.set(true);
                 return of<CompensationBreakdown[]>([]);
@@ -96,6 +104,26 @@ export class Dashboard {
 
   refresh(): void {
     this.refreshSubject.next();
+  }
+
+  changeReportingCurrency(currency: Currency): void {
+    this.selectedReportingCurrency.set(currency);
+    this.refreshSubject.next();
+  }
+
+  goToEmployees(): void {
+    void this.router.navigate(['/employees']);
+  }
+
+  goToFilteredEmployees(filter: 'country' | 'department' | 'jobTitle', value: string): void {
+    void this.router.navigate(['/employees'], { queryParams: { [filter]: value } });
+  }
+
+  activateDrilldown(event: KeyboardEvent, filter: 'country' | 'department' | 'jobTitle', value: string): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.goToFilteredEmployees(filter, value);
+    }
   }
 
   formatSalary(value: number): string {

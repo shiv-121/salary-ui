@@ -10,7 +10,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   Subject,
   catchError,
@@ -19,7 +19,6 @@ import {
   finalize,
   map,
   of,
-  startWith,
   switchMap
 } from 'rxjs';
 
@@ -65,6 +64,8 @@ const SORTABLE_FIELDS: readonly EmployeeSortField[] = [
 })
 export class EmployeeList {
   private readonly employeeService = inject(EmployeeService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly requestSubject = new Subject<void>();
 
@@ -116,9 +117,26 @@ export class EmployeeList {
         }
       });
 
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => {
+        this.filters.patchValue(
+          {
+            search: params.get('search') ?? '',
+            country: params.get('country') ?? '',
+            department: params.get('department') ?? '',
+            jobTitle: params.get('jobTitle') ?? ''
+          },
+          { emitEvent: false }
+        );
+        this.pageIndex.set(this.parsePage(params.get('page')));
+        this.pageSize.set(this.parsePageSize(params.get('size')));
+        this.setSortFromQuery(params.get('sort'));
+        this.requestSubject.next();
+      });
+
     this.filters.valueChanges
       .pipe(
-        startWith(this.filters.getRawValue()),
         debounceTime(350),
         map(() => this.filters.getRawValue()),
         distinctUntilChanged(
@@ -132,14 +150,14 @@ export class EmployeeList {
       )
       .subscribe(() => {
         this.pageIndex.set(0);
-        this.requestSubject.next();
+        void this.updateUrl();
       });
   }
 
   onPageChange(event: PageEvent): void {
     this.pageIndex.set(event.pageIndex);
     this.pageSize.set(Math.min(event.pageSize, 100));
-    this.requestSubject.next();
+    void this.updateUrl();
   }
 
   onSortChange(event: Sort): void {
@@ -151,11 +169,15 @@ export class EmployeeList {
     this.sortField.set(field);
     this.sortDirection.set(direction);
     this.pageIndex.set(0);
-    this.requestSubject.next();
+    void this.updateUrl();
   }
 
   retry(): void {
     this.requestSubject.next();
+  }
+
+  clearFilters(): void {
+    this.filters.reset();
   }
 
   private buildQuery(): EmployeeQuery {
@@ -170,5 +192,47 @@ export class EmployeeList {
       department: filterValues.department.trim(),
       jobTitle: filterValues.jobTitle.trim()
     };
+  }
+
+  private async updateUrl(): Promise<void> {
+    const values = this.filters.getRawValue();
+    const queryParams: Record<string, string | number> = {
+      page: this.pageIndex(),
+      size: this.pageSize(),
+      sort: `${this.sortField()},${this.sortDirection()}`
+    };
+
+    for (const [key, value] of Object.entries(values)) {
+      const trimmedValue = value.trim();
+      if (trimmedValue) {
+        queryParams[key] = trimmedValue;
+      }
+    }
+
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams,
+      replaceUrl: true
+    });
+  }
+
+  private parsePage(value: string | null): number {
+    const page = Number(value);
+    return Number.isInteger(page) && page >= 0 ? page : 0;
+  }
+
+  private parsePageSize(value: string | null): number {
+    const size = Number(value);
+    return [10, 20, 50, 100].includes(size) ? size : 20;
+  }
+
+  private setSortFromQuery(value: string | null): void {
+    const [field, direction] = value?.split(',') ?? [];
+    if (SORTABLE_FIELDS.includes(field as EmployeeSortField)) {
+      this.sortField.set(field as EmployeeSortField);
+    } else {
+      this.sortField.set('lastName');
+    }
+    this.sortDirection.set(direction === 'desc' ? 'desc' : 'asc');
   }
 }
