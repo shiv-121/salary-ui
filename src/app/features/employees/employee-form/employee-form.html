@@ -4,10 +4,6 @@
     <h1>Add Employee</h1>
     <p class="intro">Create a new employee record for ACME.</p>
   </div>
-  <a mat-stroked-button routerLink="/employees">
-    <mat-icon aria-hidden="true">arrow_back</mat-icon>
-    Cancel
-  </a>
 </section>
 
 <mat-card appearance="outlined" class="form-card">
@@ -80,8 +76,8 @@
     }
 
     <div class="form-actions">
-      <a mat-button routerLink="/employees">Cancel</a>
-      <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+      <a mat-stroked-button routerLink="/employees">Cancel</a>
+      <button class="primary-action" mat-flat-button color="primary" type="submit" [disabled]="submitting()">
         @if (submitting()) {
           <ng-container>
             <mat-spinner diameter="20" aria-label="Saving employee"></mat-spinner>
@@ -90,7 +86,7 @@
         } @else {
           <ng-container>
             <mat-icon aria-hidden="true">person_add</mat-icon>
-            <span>Add Employee</span>
+            <span> Add Employee</span>
           </ng-container>
         }
       </button>

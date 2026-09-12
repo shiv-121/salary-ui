@@ -11,3 +11,7 @@ h1 { margin: 0; color: #183b56; font-size: clamp(2rem, 4vw, 3rem); line-height: 
 .form-actions button { min-width: 8.5rem; }
 .form-actions button mat-spinner { display: inline-block; margin-right: 0.4rem; }
 @media (max-width: 600px) { .page-heading { align-items: flex-start; flex-direction: column; } .form-card { padding: 1.25rem; } .form-grid { grid-template-columns: 1fr; } .form-grid mat-form-field:last-child { grid-column: auto; max-width: none; } .form-actions { justify-content: stretch; } .form-actions a, .form-actions button { flex: 1; } }
+
+.page-heading { margin-bottom: 2.25rem; }
+.form-card { background: var(--acme-white); box-shadow: 0 6px 20px rgb(24 59 86 / 4%); }
+.form-grid mat-form-field { width: 100%; }

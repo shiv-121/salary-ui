@@ -8,6 +8,11 @@ h1 { margin: 0; color: #183b56; font-size: clamp(2rem, 4vw, 3rem); line-height: 
 .submit-error { display: flex; align-items: flex-start; gap: 0.65rem; margin-top: 0.5rem; padding: 0.85rem 1rem; border: 1px solid #e7b8b8; background: #fff7f7; color: #9b3838; line-height: 1.45; }
 .submit-error mat-icon { flex: 0 0 auto; }
 .form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; }
-.form-actions button { min-width: 9.5rem; }
+.form-actions a, .form-actions button { min-width: 9.5rem; justify-content: center; }
+.form-actions .primary-action { min-width: 0; }
 .form-actions button mat-spinner { display: inline-block; margin-right: 0.4rem; }
 @media (max-width: 600px) { .page-heading { align-items: flex-start; flex-direction: column; } .form-card { padding: 1.25rem; } .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: auto; } .form-actions { justify-content: stretch; } .form-actions a, .form-actions button { flex: 1; } }
+
+.page-heading { margin-bottom: 2.25rem; }
+.form-card { background: var(--acme-white); box-shadow: 0 6px 20px rgb(24 59 86 / 4%); }
+.form-grid mat-form-field { width: 100%; }

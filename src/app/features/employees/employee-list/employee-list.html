@@ -6,9 +6,9 @@
   </div>
   <div class="heading-actions">
     <span class="total-count" aria-live="polite">{{ totalElements() }} employees</span>
-    <a mat-flat-button color="primary" routerLink="/employees/new">
+    <a class="primary-action" mat-flat-button color="primary" routerLink="/employees/new">
       <mat-icon aria-hidden="true">person_add</mat-icon>
-      Add Employee
+      <span>Add Employee</span>
     </a>
   </div>
 </section>
@@ -101,9 +101,9 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef>Actions</th>
           <td mat-cell *matCellDef="let employee">
-            <a mat-stroked-button [routerLink]="['/employees', employee.id]">
+            <a class="table-action" mat-stroked-button [routerLink]="['/employees', employee.id]">
               <mat-icon aria-hidden="true">visibility</mat-icon>
-              View
+              <span>View</span>
             </a>
           </td>
         </ng-container>

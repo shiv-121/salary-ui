@@ -1,14 +1,33 @@
 html {
 	color-scheme: light;
-	font-family: 'Avenir Next', 'Helvetica Neue', sans-serif;
+	font-family: 'Roboto', 'Helvetica Neue', sans-serif;
 	background: #f4f7f8;
+}
+
+:root {
+	--acme-navy: #183b56;
+	--acme-navy-muted: #466477;
+	--acme-teal: #6fcfbf;
+	--acme-teal-dark: #287f82;
+	--acme-surface: #f4f7f8;
+	--acme-surface-tint: #eaf5f3;
+	--acme-white: #ffffff;
+	--acme-border: #dbe6e9;
+	--acme-danger: #a33b3b;
+	--acme-primary: #183b56;
+	--acme-primary-hover: #2c5873;
+	--acme-control-height: 2.5rem;
+	--acme-control-radius: 0.45rem;
+	--acme-control-padding: 1rem;
+	--acme-control-gap: 0.45rem;
 }
 
 body {
 	min-width: 320px;
 	margin: 0;
-	color: #183b56;
-	background: #f4f7f8;
+	color: var(--acme-navy);
+	background: var(--acme-surface);
+	font-family: inherit;
 }
 
 *,
@@ -16,3 +35,99 @@ body {
 *::after {
 	box-sizing: border-box;
 }
+
+.mat-mdc-button,
+.mat-mdc-outlined-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-raised-button {
+	min-height: var(--acme-control-height);
+	padding-inline: var(--acme-control-padding);
+	line-height: 1.25;
+	font-family: inherit;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	white-space: nowrap;
+	border-radius: var(--acme-control-radius);
+}
+
+.mat-mdc-button .mat-icon,
+.mat-mdc-outlined-button .mat-icon,
+.mat-mdc-unelevated-button .mat-icon,
+.mat-mdc-raised-button .mat-icon {
+	width: 1.15rem;
+	height: 1.15rem;
+	font-size: 1.15rem;
+	flex: 0 0 auto;
+}
+
+.mat-mdc-button:has(> mat-icon + span) > mat-icon,
+.mat-mdc-outlined-button:has(> mat-icon + span) > mat-icon,
+.mat-mdc-unelevated-button:has(> mat-icon + span) > mat-icon,
+.mat-mdc-raised-button:has(> mat-icon + span) > mat-icon {
+	margin-inline-end: var(--acme-control-gap);
+}
+
+.mat-mdc-unelevated-button.mat-primary,
+.mat-mdc-raised-button.mat-primary {
+	--mdc-filled-button-container-color: var(--acme-primary);
+	--mdc-filled-button-label-text-color: #fff;
+	background: var(--acme-primary) !important;
+	color: #fff !important;
+}
+
+.mat-mdc-unelevated-button.mat-primary:hover,
+.mat-mdc-raised-button.mat-primary:hover {
+	--mdc-filled-button-container-color: var(--acme-primary-hover);
+	background: var(--acme-primary-hover) !important;
+}
+
+.mat-mdc-button.primary-action,
+.mat-mdc-outlined-button.primary-action,
+.mat-mdc-unelevated-button.primary-action,
+.mat-mdc-raised-button.primary-action {
+	gap: 0.45rem;
+}
+
+.primary-action > .mat-icon {
+	margin-inline-end: 0.1rem !important;
+}
+
+.mat-mdc-outlined-button {
+	border-color: #b8c8cf;
+	color: var(--acme-navy);
+	background: var(--acme-white);
+}
+
+.mat-mdc-outlined-button:hover {
+	border-color: #8fa8b1;
+	background: #f5f8f9;
+}
+
+.mat-mdc-outlined-button.table-action {
+	--mdc-outlined-button-outline-color: var(--acme-teal-dark);
+	--mdc-outlined-button-label-text-color: var(--acme-teal-dark);
+	border-color: var(--acme-teal-dark) !important;
+	color: var(--acme-teal-dark) !important;
+}
+
+.mat-mdc-outlined-button.table-action:hover {
+	--mdc-outlined-button-outline-color: var(--acme-navy);
+	border-color: var(--acme-navy) !important;
+	background: #eef3f6;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button {
+	border-radius: var(--acme-control-radius);
+}
+
+.mat-mdc-button:focus-visible,
+.mat-mdc-outlined-button:focus-visible,
+.mat-mdc-unelevated-button:focus-visible,
+.mat-mdc-raised-button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+	outline: 3px solid rgb(40 127 130 / 35%);
+	outline-offset: 2px;
+}
+
+.mat-mdc-card { border-color: var(--acme-border); border-radius: 0.75rem; }

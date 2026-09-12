@@ -6,7 +6,7 @@
   </div>
   <a mat-stroked-button [routerLink]="employeeId() ? ['/employees', employeeId()] : ['/employees']">
     <mat-icon aria-hidden="true">arrow_back</mat-icon>
-    Cancel
+    <span>Cancel</span>
   </a>
 </section>
 
@@ -54,7 +54,7 @@
     }
 
     <div class="form-actions">
-      <a mat-button [routerLink]="employeeId() ? ['/employees', employeeId()] : ['/employees']">Cancel</a>
+      <a mat-stroked-button [routerLink]="employeeId() ? ['/employees', employeeId()] : ['/employees']">Cancel</a>
       <button mat-flat-button color="primary" type="submit" [disabled]="submitting() || employeeId() === null">
         @if (submitting()) {
           <ng-container>
