@@ -17,9 +17,11 @@
 .sidenav-footer { display: flex; align-items: center; gap: 0.65rem; margin-top: auto; padding: 1rem 0.75rem 0; border-top: 1px solid rgb(255 255 255 / 12%); color: #a9c1c8; font-size: 0.8rem; }
 .sidenav-footer mat-icon { color: var(--acme-teal); font-size: 1.1rem; }
 .app-main { background: var(--acme-surface); }
-.app-header { position: sticky; top: 0; z-index: 10; display: flex; min-height: 3.75rem; justify-content: center; padding: 0 2rem; background: var(--acme-white); color: var(--acme-navy); border-bottom: 1px solid var(--acme-border); box-shadow: 0 2px 12px rgb(24 59 86 / 5%); }
-.header-context { display: grid; justify-items: center; line-height: 1.1; text-align: center; }
-.header-kicker { color: var(--acme-teal-dark); font-size: 1rem; font-weight: 700; letter-spacing: 0.12em; }
-.app-content { width: min(calc(100% - 5rem), 78rem); min-height: calc(100dvh - 3.75rem); margin: 0 auto; padding: 2.25rem 0 4rem; }
+.app-header { position: sticky; top: 0; z-index: 10; display: flex; min-height: 4.5rem; justify-content: center; padding: 0 2rem; background: var(--acme-white); color: var(--acme-navy); border-bottom: 1px solid var(--acme-border); box-shadow: 0 2px 12px rgb(24 59 86 / 5%); }
+.header-context { display: flex; width: 100%; align-items: center; justify-content: center; gap: 0.65rem; line-height: 1.1; text-align: center; }
+.header-mark { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: 0.6rem; background: var(--acme-surface-tint); color: var(--acme-teal-dark); }
+.header-mark mat-icon { width: 1.35rem; height: 1.35rem; font-size: 1.35rem; }
+.header-kicker { color: var(--acme-teal-dark); font-size: clamp(1.1rem, 2vw, 1.35rem); font-weight: 700; letter-spacing: 0.12em; }
+.app-content { width: min(calc(100% - 5rem), 78rem); min-height: calc(100dvh - 4.5rem); margin: 0 auto; padding: 2.25rem 0 4rem; }
 @media (max-width: 800px) { .app-sidenav { width: 4.75rem; padding-inline: 0.5rem; } .brand { justify-content: center; padding-inline: 0; } .brand-copy, .sidenav-footer span, .side-nav [matListItemTitle] { display: none; } .side-nav a { justify-content: center; padding-inline: 0; } .side-nav a [matListItemIcon] { margin: 0; } .sidenav-footer { justify-content: center; padding-inline: 0; } .app-header { padding-inline: 1.25rem; } .app-content { width: min(calc(100% - 2.5rem), 78rem); } }
 @media (max-width: 520px) { .app-content { width: min(calc(100% - 1.5rem), 78rem); padding-top: 1.5rem; } }
