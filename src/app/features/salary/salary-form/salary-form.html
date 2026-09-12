@@ -1,0 +1,73 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Salary management</p>
+    <h1>Add Salary</h1>
+    <p class="intro">Create a new salary record for employee {{ employeeId() ?? 'unknown' }}.</p>
+  </div>
+  <a mat-stroked-button [routerLink]="employeeId() ? ['/employees', employeeId()] : ['/employees']">
+    <mat-icon aria-hidden="true">arrow_back</mat-icon>
+    Cancel
+  </a>
+</section>
+
+<mat-card appearance="outlined" class="form-card">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Salary Amount</mat-label>
+        <input matInput type="number" min="0.01" step="0.01" formControlName="amount" />
+        @if (form.controls.amount.hasError('required')) {
+          <mat-error>Salary amount is required.</mat-error>
+        } @else if (form.controls.amount.hasError('min')) {
+          <mat-error>Salary amount must be greater than 0.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Currency</mat-label>
+        <mat-select formControlName="currency">
+          @for (currency of currencies; track currency) {
+            <mat-option [value]="currency">{{ currency }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.currency.hasError('required')) {
+          <mat-error>Currency is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Effective From</mat-label>
+        <input matInput [matDatepicker]="effectiveFromPicker" formControlName="effectiveFrom" />
+        <mat-datepicker-toggle matIconSuffix [for]="effectiveFromPicker"></mat-datepicker-toggle>
+        <mat-datepicker #effectiveFromPicker></mat-datepicker>
+        @if (form.controls.effectiveFrom.hasError('required')) {
+          <mat-error>Effective date is required.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if (submitError(); as errorMessage) {
+      <div class="submit-error" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <div class="form-actions">
+      <a mat-button [routerLink]="employeeId() ? ['/employees', employeeId()] : ['/employees']">Cancel</a>
+      <button mat-flat-button color="primary" type="submit" [disabled]="submitting() || employeeId() === null">
+        @if (submitting()) {
+          <ng-container>
+            <mat-spinner diameter="20" aria-label="Saving salary"></mat-spinner>
+            <span>Saving...</span>
+          </ng-container>
+        } @else {
+          <ng-container>
+            <mat-icon aria-hidden="true">save</mat-icon>
+            <span>Add Salary</span>
+          </ng-container>
+        }
+      </button>
+    </div>
+  </form>
+</mat-card>

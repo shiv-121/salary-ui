@@ -1,0 +1,13 @@
+.page-heading { display: flex; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: 2rem; }
+.eyebrow { margin: 0 0 0.45rem; color: #287f82; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+h1 { margin: 0; color: #183b56; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; }
+.intro { margin: 0.75rem 0 0; color: #547080; font-size: 1.05rem; }
+.form-card { max-width: 54rem; padding: 2rem; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.form-grid mat-form-field:last-child { grid-column: 1 / -1; max-width: calc(50% - 0.5rem); }
+.submit-error { display: flex; align-items: flex-start; gap: 0.65rem; margin-top: 0.5rem; padding: 0.85rem 1rem; border: 1px solid #e7b8b8; background: #fff7f7; color: #9b3838; line-height: 1.45; }
+.submit-error mat-icon { flex: 0 0 auto; }
+.form-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 2rem; }
+.form-actions button { min-width: 8.5rem; }
+.form-actions button mat-spinner { display: inline-block; margin-right: 0.4rem; }
+@media (max-width: 600px) { .page-heading { align-items: flex-start; flex-direction: column; } .form-card { padding: 1.25rem; } .form-grid { grid-template-columns: 1fr; } .form-grid mat-form-field:last-child { grid-column: auto; max-width: none; } .form-actions { justify-content: stretch; } .form-actions a, .form-actions button { flex: 1; } }

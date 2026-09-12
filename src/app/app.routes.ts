@@ -19,8 +19,8 @@ export const routes: Routes = [
 				path: ':id/salaries/new',
 				title: 'Add Salary | ACME Salary Management',
 				loadComponent: () =>
-					import('./features/salary/salary-form/salary-form-placeholder').then(
-						(module) => module.SalaryFormPlaceholder
+					import('./features/salary/salary-form/salary-form').then(
+						(module) => module.SalaryForm
 					)
 			},
 			{
