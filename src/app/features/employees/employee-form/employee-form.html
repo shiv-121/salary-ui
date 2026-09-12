@@ -1,0 +1,95 @@
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">People operations</p>
+    <h1>Add Employee</h1>
+    <p class="intro">Create a new employee record for ACME.</p>
+  </div>
+</section>
+
+<mat-card appearance="outlined" class="form-card">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Employee Code</mat-label>
+        <input matInput formControlName="employeeCode" autocomplete="off" />
+        @if (form.controls.employeeCode.hasError('required') || form.controls.employeeCode.hasError('pattern')) {
+          <mat-error>Employee code is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="firstName" autocomplete="given-name" />
+        @if (form.controls.firstName.hasError('required') || form.controls.firstName.hasError('pattern')) {
+          <mat-error>First name is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="lastName" autocomplete="family-name" />
+        @if (form.controls.lastName.hasError('required') || form.controls.lastName.hasError('pattern')) {
+          <mat-error>Last name is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" autocomplete="email" />
+        @if (form.controls.email.hasError('required')) {
+          <mat-error>Email is required.</mat-error>
+        } @else if (form.controls.email.hasError('email')) {
+          <mat-error>Enter a valid email address.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Country</mat-label>
+        <input matInput formControlName="country" autocomplete="country-name" />
+        @if (form.controls.country.hasError('required') || form.controls.country.hasError('pattern')) {
+          <mat-error>Country is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Department</mat-label>
+        <input matInput formControlName="department" />
+        @if (form.controls.department.hasError('required') || form.controls.department.hasError('pattern')) {
+          <mat-error>Department is required.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="jobTitle" />
+        @if (form.controls.jobTitle.hasError('required') || form.controls.jobTitle.hasError('pattern')) {
+          <mat-error>Job title is required.</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    @if (submitError(); as errorMessage) {
+      <div class="submit-error" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    <div class="form-actions">
+      <a mat-stroked-button routerLink="/employees">Cancel</a>
+      <button class="primary-action" mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+        @if (submitting()) {
+          <ng-container>
+            <mat-spinner diameter="20" aria-label="Saving employee"></mat-spinner>
+            <span>Saving...</span>
+          </ng-container>
+        } @else {
+          <ng-container>
+            <mat-icon aria-hidden="true">person_add</mat-icon>
+            <span> Add Employee</span>
+          </ng-container>
+        }
+      </button>
+    </div>
+  </form>
+</mat-card>

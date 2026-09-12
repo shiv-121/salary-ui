@@ -1,24 +1,115 @@
 <section class="page-heading">
   <div>
-    <p class="eyebrow">Overview</p>
-    <h1>Dashboard</h1>
-    <p class="intro">A clear view of your employee and salary operations.</p>
+    <p class="eyebrow">Compensation analytics</p>
+    <h1>Overview</h1>
+    <p class="intro">Employee and compensation insights at a glance.</p>
+  </div>
+  <div class="dashboard-controls">
+    <mat-form-field class="currency-select" appearance="outline">
+      <mat-label>Reporting currency</mat-label>
+      <mat-select [value]="selectedReportingCurrency()" (selectionChange)="changeReportingCurrency($event.value)" [disabled]="loading()">
+        @for (currency of currencies; track currency) {
+          <mat-option [value]="currency">{{ currency }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button class="secondary-action" mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()">
+      <mat-icon aria-hidden="true">refresh</mat-icon>
+      <span>Refresh</span>
+    </button>
   </div>
 </section>
 
-<section class="dashboard-grid" aria-label="Dashboard summary">
-  <mat-card appearance="outlined" class="summary-card">
-    <mat-icon aria-hidden="true">groups</mat-icon>
-    <div>
-      <span class="summary-label">Employees</span>
-      <strong>Ready for data</strong>
-    </div>
-  </mat-card>
-  <mat-card appearance="outlined" class="summary-card">
-    <mat-icon aria-hidden="true">payments</mat-icon>
-    <div>
-      <span class="summary-label">Salary operations</span>
-      <strong>Ready for data</strong>
-    </div>
-  </mat-card>
-</section>
+@if (loading()) {
+  <div class="loading-state" role="status" aria-live="polite">
+    <mat-spinner diameter="40" aria-label="Loading compensation analytics"></mat-spinner>
+    <span>Loading compensation analytics...</span>
+  </div>
+} @else {
+  @if (summaryError()) {
+    <mat-card appearance="outlined" class="message-card error-card" role="alert">
+      <mat-icon aria-hidden="true">cloud_off</mat-icon>
+      <div>
+        <h2>Unable to load compensation summary</h2>
+        <p>Please try again.</p>
+      </div>
+      <button mat-stroked-button type="button" (click)="refresh()">Try again</button>
+    </mat-card>
+  }
+  @if (summary(); as compensation) {
+    <section class="summary-grid" aria-label="Compensation summary">
+      <mat-card appearance="outlined" class="summary-card clickable-card" role="link" tabindex="0" aria-label="View all employees" (click)="goToEmployees()" (keydown.enter)="goToEmployees()" (keydown.space)="$event.preventDefault(); goToEmployees()">
+        <mat-icon aria-hidden="true">groups</mat-icon>
+        <div><span class="summary-label">Total Employees</span><strong>{{ compensation.totalEmployees | number }}</strong><small>Employees in scope</small></div>
+      </mat-card>
+      <mat-card appearance="outlined" class="summary-card">
+        <mat-icon aria-hidden="true">payments</mat-icon>
+        <div><span class="summary-label">Average Salary</span><strong>{{ compensation.averageSalary | currency: compensation.reportingCurrency:'symbol':'1.2-2' }}</strong><small>{{ compensation.reportingCurrency }} reporting currency</small></div>
+      </mat-card>
+      <mat-card appearance="outlined" class="summary-card">
+        <mat-icon aria-hidden="true">analytics</mat-icon>
+        <div><span class="summary-label">Median Salary</span><strong>{{ compensation.medianSalary === null ? 'Unavailable' : (compensation.medianSalary | currency: compensation.reportingCurrency:'symbol':'1.2-2') }}</strong><small>{{ compensation.reportingCurrency }} reporting currency</small></div>
+      </mat-card>
+      <mat-card appearance="outlined" class="summary-card">
+        <mat-icon aria-hidden="true">trending_up</mat-icon>
+        <div><span class="summary-label">Highest Salary</span><strong>{{ compensation.highestSalary === null ? 'Unavailable' : (compensation.highestSalary | currency: compensation.reportingCurrency:'symbol':'1.2-2') }}</strong><small>{{ compensation.reportingCurrency }} reporting currency</small></div>
+      </mat-card>
+      <mat-card appearance="outlined" class="summary-card">
+        <mat-icon aria-hidden="true">trending_down</mat-icon>
+        <div><span class="summary-label">Lowest Salary</span><strong>{{ compensation.lowestSalary === null ? 'Unavailable' : (compensation.lowestSalary | currency: compensation.reportingCurrency:'symbol':'1.2-2') }}</strong><small>{{ compensation.reportingCurrency }} reporting currency</small></div>
+      </mat-card>
+    </section>
+    }
+
+    <section class="breakdown-grid" aria-label="Compensation breakdowns">
+      <mat-card appearance="outlined" class="breakdown-card">
+        <div class="section-heading"><mat-icon aria-hidden="true">public</mat-icon><h2>Compensation by Country</h2></div>
+        @if (countryError()) {
+          <div class="inline-error" role="alert"><mat-icon aria-hidden="true">error_outline</mat-icon><span>Unable to load country data.</span></div>
+        } @else if (countries().length === 0) {
+          <div class="empty-state"><mat-icon aria-hidden="true">public_off</mat-icon><span>No country compensation data available.</span></div>
+        } @else {
+          <div class="chart-container" role="img" aria-label="Average salary by country chart">
+            <canvas baseChart [data]="countryChartData()" [options]="countryChartOptions" type="bar" (chartClick)="onCountryChartClick($event.active)"></canvas>
+          </div>
+          <p class="chart-hint">Select a bar to view employees in that country.</p>
+        }
+      </mat-card>
+
+      <mat-card appearance="outlined" class="breakdown-card">
+        <div class="section-heading"><mat-icon aria-hidden="true">account_tree</mat-icon><h2>Compensation by Department</h2></div>
+        @if (departmentError()) {
+          <div class="inline-error" role="alert"><mat-icon aria-hidden="true">error_outline</mat-icon><span>Unable to load department data.</span></div>
+        } @else if (departments().length === 0) {
+          <div class="empty-state"><mat-icon aria-hidden="true">folder_off</mat-icon><span>No department compensation data available.</span></div>
+        } @else {
+          <div class="chart-container" role="img" aria-label="Average salary by department chart">
+            <canvas baseChart [data]="departmentChartData()" [options]="departmentChartOptions" type="bar" (chartClick)="onDepartmentChartClick($event.active)"></canvas>
+          </div>
+          <p class="chart-hint">Select a bar to view employees in that department.</p>
+        }
+      </mat-card>
+
+      <mat-card appearance="outlined" class="breakdown-card job-title-card">
+        <div class="section-heading"><mat-icon aria-hidden="true">work</mat-icon><h2>Compensation by Job Title</h2></div>
+        @if (jobTitleError()) {
+          <div class="inline-error" role="alert"><mat-icon aria-hidden="true">error_outline</mat-icon><span>Unable to load job title data.</span></div>
+        } @else if (jobTitles().length === 0) {
+          <div class="empty-state"><mat-icon aria-hidden="true">work_off</mat-icon><span>No job title compensation data available.</span></div>
+        } @else {
+          <div class="table-wrapper"><table mat-table [dataSource]="jobTitles()">
+            <ng-container matColumnDef="group"><th mat-header-cell *matHeaderCellDef>Job Title</th><td mat-cell *matCellDef="let item">{{ item.group }}</td></ng-container>
+            <ng-container matColumnDef="employeeCount"><th mat-header-cell *matHeaderCellDef>Employees</th><td mat-cell *matCellDef="let item">{{ item.employeeCount | number }}</td></ng-container>
+            <ng-container matColumnDef="averageSalary"><th mat-header-cell *matHeaderCellDef>Average</th><td mat-cell *matCellDef="let item">{{ formatSalary(item.averageSalary) }}</td></ng-container>
+            <ng-container matColumnDef="medianSalary"><th mat-header-cell *matHeaderCellDef>Median</th><td mat-cell *matCellDef="let item">{{ item.medianSalary === null ? 'Unavailable' : formatSalary(item.medianSalary) }}</td></ng-container>
+            <tr mat-header-row *matHeaderRowDef="breakdownColumns"></tr><tr class="clickable-row" mat-row *matRowDef="let row; columns: breakdownColumns" role="link" tabindex="0" (click)="goToFilteredEmployees('jobTitle', row.group)" (keydown)="activateDrilldown($event, 'jobTitle', row.group)"></tr>
+          </table></div>
+        }
+      </mat-card>
+    </section>
+
+    <section class="quick-actions" aria-label="Quick actions">
+      <div><p class="eyebrow">Shortcuts</p><h2>Quick Actions</h2></div>
+      <div class="action-row"><a class="primary-action" mat-flat-button color="primary" routerLink="/employees/new"><mat-icon aria-hidden="true">person_add</mat-icon><span>Add Employee</span></a><a mat-stroked-button routerLink="/employees"><mat-icon aria-hidden="true">groups</mat-icon><span>View Employees</span></a></div>
+    </section>
+}

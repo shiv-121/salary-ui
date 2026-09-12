@@ -1,17 +1,42 @@
-<mat-toolbar class="app-header">
-  <a class="brand" routerLink="/dashboard" aria-label="ACME Salary Management home">
-    <mat-icon aria-hidden="true">account_balance</mat-icon>
-    <span>ACME Salary Management</span>
-  </a>
-
-  <nav class="primary-nav" aria-label="Primary navigation">
-    <a mat-button routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
-      Dashboard
+<mat-sidenav-container class="app-shell">
+  <mat-sidenav class="app-sidenav" mode="side" opened>
+    <a class="brand" routerLink="/dashboard" aria-label="ACME Salary Management home">
+      <span class="brand-mark" aria-hidden="true"><mat-icon>account_balance</mat-icon></span>
+      <span class="brand-copy">
+        <strong>ACME</strong>
+        <span>Salary Management</span>
+      </span>
     </a>
-    <a mat-button routerLink="/employees" routerLinkActive="active-link">Employees</a>
-  </nav>
-</mat-toolbar>
 
-<main class="app-content">
-  <router-outlet></router-outlet>
-</main>
+    <mat-divider></mat-divider>
+
+    <nav class="side-nav" aria-label="Primary navigation">
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-nav" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon matListItemIcon aria-hidden="true">dashboard</mat-icon>
+        <span matListItemTitle>Dashboard</span>
+      </a>
+      <a mat-list-item routerLink="/employees" routerLinkActive="active-nav" [routerLinkActiveOptions]="{ exact: true }">
+        <mat-icon matListItemIcon aria-hidden="true">groups</mat-icon>
+        <span matListItemTitle>Employees</span>
+      </a>
+    </nav>
+
+    <div class="sidenav-footer">
+      <mat-icon aria-hidden="true">shield</mat-icon>
+      <span>HR Manager</span>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="app-main">
+    <mat-toolbar class="app-header">
+      <div class="header-context" aria-label="ACME People Operations Salary Management">
+        <span class="header-mark" aria-hidden="true"><mat-icon>corporate_fare</mat-icon></span>
+        <span class="header-kicker">ACME PEOPLE OPERATIONS</span>
+      </div>
+    </mat-toolbar>
+
+    <main class="app-content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

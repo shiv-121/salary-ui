@@ -1,5 +1,119 @@
-<section class="details-placeholder">
-  <p class="eyebrow">Employee record</p>
-  <h1>Employee details</h1>
-  <p>The employee details view will be implemented in the next step.</p>
-</section>
+@if (employeeLoading()) {
+  <div class="loading-state" role="status" aria-live="polite">
+    <mat-spinner diameter="40" aria-label="Loading employee"></mat-spinner>
+    <span>Loading employee...</span>
+  </div>
+}
+
+@if (employeeError(); as errorMessage) {
+  <mat-card appearance="outlined" class="message-card error-state" role="alert">
+    <mat-icon aria-hidden="true">person_off</mat-icon>
+    <h1>Employee unavailable</h1>
+    <p>{{ errorMessage }}</p>
+    <a mat-stroked-button routerLink="/employees">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
+      Back to Employees
+    </a>
+  </mat-card>
+}
+
+@if (!employeeLoading() && employee(); as employeeData) {
+  <div class="details-page">
+    <header class="page-heading">
+      <div>
+        <p class="eyebrow">Employee record</p>
+        <h1>{{ employeeData.firstName }} {{ employeeData.lastName }}</h1>
+        <p class="intro">{{ employeeData.employeeCode }} · {{ employeeData.jobTitle }}</p>
+      </div>
+      <div class="heading-actions">
+        <a mat-stroked-button routerLink="/employees">
+          <mat-icon aria-hidden="true">arrow_back</mat-icon>
+          <span>Back to Employees</span>
+        </a>
+        <a mat-flat-button color="primary" [routerLink]="['/employees', employeeData.id, 'salaries', 'new']">
+          <mat-icon aria-hidden="true">add</mat-icon>
+          <span>Add Salary</span>
+        </a>
+      </div>
+    </header>
+
+    <section class="details-grid">
+      <mat-card appearance="outlined" class="profile-card">
+        <div class="section-heading">
+          <mat-icon aria-hidden="true">badge</mat-icon>
+          <h2>Employee Information</h2>
+        </div>
+        <mat-divider></mat-divider>
+        <dl class="profile-fields">
+          <div><dt>Employee Code</dt><dd>{{ employeeData.employeeCode }}</dd></div>
+          <div><dt>Full Name</dt><dd>{{ employeeData.firstName }} {{ employeeData.lastName }}</dd></div>
+          <div><dt>Email</dt><dd>{{ employeeData.email }}</dd></div>
+          <div><dt>Country</dt><dd>{{ employeeData.country }}</dd></div>
+          <div><dt>Department</dt><dd>{{ employeeData.department }}</dd></div>
+          <div><dt>Job Title</dt><dd>{{ employeeData.jobTitle }}</dd></div>
+        </dl>
+      </mat-card>
+
+      <mat-card appearance="outlined" class="salary-card">
+        <div class="section-heading">
+          <mat-icon aria-hidden="true">payments</mat-icon>
+          <h2>Current Salary</h2>
+        </div>
+        <mat-divider></mat-divider>
+        @if (salaryLoading()) {
+          <div class="card-loading"><mat-spinner diameter="30" aria-label="Loading salary"></mat-spinner></div>
+        } @else if (currentSalary(); as salary) {
+          <div class="current-salary">
+            <span class="salary-amount">{{ salary.amount | currency: salary.currency:'symbol':'1.2-2' }}</span>
+            <span class="salary-currency">{{ salary.currency }}</span>
+            <span class="salary-date">Effective from {{ salary.effectiveFrom | date:'mediumDate' }}</span>
+          </div>
+        } @else {
+          <div class="salary-empty">
+            <mat-icon aria-hidden="true">payments</mat-icon>
+            <p>{{ currentSalaryError() || 'No current salary found.' }}</p>
+          </div>
+        }
+      </mat-card>
+    </section>
+
+    <section class="history-section">
+      <div class="section-heading">
+        <mat-icon aria-hidden="true">history</mat-icon>
+        <h2>Salary History</h2>
+      </div>
+      @if (salaryHistoryError(); as historyError) {
+        <mat-card appearance="outlined" class="message-card inline-error" role="alert">
+          <mat-icon aria-hidden="true">cloud_off</mat-icon>
+          <p>{{ historyError }}</p>
+        </mat-card>
+      } @else if (salaryLoading()) {
+        <div class="loading-state compact" role="status"><mat-spinner diameter="32" aria-label="Loading salary history"></mat-spinner></div>
+      } @else if (salaryHistory().length === 0) {
+        <mat-card appearance="outlined" class="message-card empty-state">
+          <mat-icon aria-hidden="true">receipt_long</mat-icon>
+          <p>No salary history is available for this employee.</p>
+        </mat-card>
+      } @else {
+        <mat-card appearance="outlined" class="history-card">
+          <div class="history-table" role="table" aria-label="Salary history">
+            <div class="history-row history-header" role="row">
+              <span role="columnheader">Effective From</span>
+              <span role="columnheader">Effective To</span>
+              <span role="columnheader">Amount</span>
+              <span role="columnheader">Currency</span>
+            </div>
+            @for (salary of salaryHistory(); track salary.id) {
+              <div class="history-row" role="row">
+                <span role="cell">{{ salary.effectiveFrom | date:'mediumDate' }}</span>
+                <span role="cell">{{ salary.effectiveTo ? (salary.effectiveTo | date:'mediumDate') : 'Present' }}</span>
+                <span role="cell">{{ salary.amount | currency: salary.currency:'symbol':'1.2-2' }}</span>
+                <span role="cell">{{ salary.currency }}</span>
+              </div>
+            }
+          </div>
+        </mat-card>
+      }
+    </section>
+  </div>
+}
