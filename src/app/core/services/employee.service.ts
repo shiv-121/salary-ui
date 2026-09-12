@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { Employee } from '../models/employee.model';
 import { PageResponse } from '../models/page-response.model';
+import { Salary } from '../models/salary.model';
 import { ApiConfigService } from './api-config.service';
 
 export interface EmployeeQuery {
@@ -36,5 +37,17 @@ export class EmployeeService {
     return this.http.get<PageResponse<Employee>>(`${this.apiConfig.baseUrl}/api/employees`, {
       params
     });
+  }
+
+  getEmployee(id: number): Observable<Employee> {
+    return this.http.get<Employee>(`${this.apiConfig.baseUrl}/api/employees/${id}`);
+  }
+
+  getSalaryHistory(employeeId: number): Observable<Salary[]> {
+    return this.http.get<Salary[]>(`${this.apiConfig.baseUrl}/api/employees/${employeeId}/salaries`);
+  }
+
+  getCurrentSalary(employeeId: number): Observable<Salary | null> {
+    return this.http.get<Salary>(`${this.apiConfig.baseUrl}/api/employees/${employeeId}/salaries/current`);
   }
 }
