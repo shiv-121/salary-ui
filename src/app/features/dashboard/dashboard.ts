@@ -1,5 +1,5 @@
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,6 +8,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData, ChartOptions } from 'chart.js';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, catchError, finalize, forkJoin, of, switchMap } from 'rxjs';
 
@@ -27,6 +29,7 @@ import { AnalyticsService } from '../../core/services/analytics.service';
     MatProgressSpinnerModule,
     MatSelectModule,
     MatTableModule,
+    BaseChartDirective,
     RouterLink
   ],
   templateUrl: './dashboard.html',
@@ -51,6 +54,10 @@ export class Dashboard {
   readonly departmentError = signal(false);
   readonly jobTitleError = signal(false);
   readonly breakdownColumns = ['group', 'employeeCount', 'averageSalary', 'medianSalary'];
+  readonly countryChartData = computed<ChartData<'bar'>>(() => this.createChartData(this.countries()));
+  readonly departmentChartData = computed<ChartData<'bar'>>(() => this.createChartData(this.departments()));
+  readonly countryChartOptions = this.createBarChartOptions(() => this.countries());
+  readonly departmentChartOptions = this.createBarChartOptions(() => this.departments());
 
   ngOnInit(): void {
     this.refreshSubject
@@ -126,17 +133,81 @@ export class Dashboard {
     }
   }
 
-  formatSalary(value: number): string {
+  onCountryChartClick(elements: object[] | undefined): void {
+    const index = (elements?.[0] as { index?: number } | undefined)?.index;
+    if (index !== undefined) {
+      const country = this.countries()[index]?.group;
+      if (country) {
+        this.goToFilteredEmployees('country', country);
+      }
+    }
+  }
+
+  onDepartmentChartClick(elements: object[] | undefined): void {
+    const index = (elements?.[0] as { index?: number } | undefined)?.index;
+    if (index !== undefined) {
+      const department = this.departments()[index]?.group;
+      if (department) {
+        this.goToFilteredEmployees('department', department);
+      }
+    }
+  }
+
+  formatSalary(value: number, fractionDigits = 2): string {
     const currency = this.reportingCurrency();
     if (!currency) {
-      return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return value.toLocaleString(undefined, { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits });
     }
 
     return new Intl.NumberFormat(undefined, {
       style: 'currency',
       currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits
     }).format(value);
+  }
+
+  private createChartData(items: CompensationBreakdown[]): ChartData<'bar'> {
+    return {
+      labels: items.map((item) => item.group),
+      datasets: [
+        {
+          data: items.map((item) => item.averageSalary),
+          backgroundColor: '#5b91ad',
+          hoverBackgroundColor: '#79abc1',
+          borderRadius: 4,
+          barThickness: 20
+        }
+      ]
+    };
+  }
+
+  private createBarChartOptions(items: () => CompensationBreakdown[]): ChartOptions<'bar'> {
+    return {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => ` Average salary: ${this.formatSalary(Number(context.raw))}`,
+            afterBody: (contexts) => {
+              const item = items()[contexts[0]?.dataIndex ?? -1];
+              return item ? `Employees: ${item.employeeCount.toLocaleString()}` : '';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          grid: { color: '#e4ebee' },
+          ticks: { callback: (value) => this.formatSalary(Number(value), 0) }
+        },
+        y: { grid: { display: false } }
+      }
+    };
   }
 }

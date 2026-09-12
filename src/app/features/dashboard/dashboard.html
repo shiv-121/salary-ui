@@ -69,13 +69,10 @@
         } @else if (countries().length === 0) {
           <div class="empty-state"><mat-icon aria-hidden="true">public_off</mat-icon><span>No country compensation data available.</span></div>
         } @else {
-          <div class="table-wrapper"><table mat-table [dataSource]="countries()">
-            <ng-container matColumnDef="group"><th mat-header-cell *matHeaderCellDef>Country</th><td mat-cell *matCellDef="let item">{{ item.group }}</td></ng-container>
-            <ng-container matColumnDef="employeeCount"><th mat-header-cell *matHeaderCellDef>Employees</th><td mat-cell *matCellDef="let item">{{ item.employeeCount | number }}</td></ng-container>
-            <ng-container matColumnDef="averageSalary"><th mat-header-cell *matHeaderCellDef>Average</th><td mat-cell *matCellDef="let item">{{ formatSalary(item.averageSalary) }}</td></ng-container>
-            <ng-container matColumnDef="medianSalary"><th mat-header-cell *matHeaderCellDef>Median</th><td mat-cell *matCellDef="let item">{{ item.medianSalary === null ? 'Unavailable' : formatSalary(item.medianSalary) }}</td></ng-container>
-            <tr mat-header-row *matHeaderRowDef="breakdownColumns"></tr><tr class="clickable-row" mat-row *matRowDef="let row; columns: breakdownColumns" role="link" tabindex="0" (click)="goToFilteredEmployees('country', row.group)" (keydown)="activateDrilldown($event, 'country', row.group)"></tr>
-          </table></div>
+          <div class="chart-container" role="img" aria-label="Average salary by country chart">
+            <canvas baseChart [data]="countryChartData()" [options]="countryChartOptions" type="bar" (chartClick)="onCountryChartClick($event.active)"></canvas>
+          </div>
+          <p class="chart-hint">Select a bar to view employees in that country.</p>
         }
       </mat-card>
 
@@ -86,13 +83,10 @@
         } @else if (departments().length === 0) {
           <div class="empty-state"><mat-icon aria-hidden="true">folder_off</mat-icon><span>No department compensation data available.</span></div>
         } @else {
-          <div class="table-wrapper"><table mat-table [dataSource]="departments()">
-            <ng-container matColumnDef="group"><th mat-header-cell *matHeaderCellDef>Department</th><td mat-cell *matCellDef="let item">{{ item.group }}</td></ng-container>
-            <ng-container matColumnDef="employeeCount"><th mat-header-cell *matHeaderCellDef>Employees</th><td mat-cell *matCellDef="let item">{{ item.employeeCount | number }}</td></ng-container>
-            <ng-container matColumnDef="averageSalary"><th mat-header-cell *matHeaderCellDef>Average</th><td mat-cell *matCellDef="let item">{{ formatSalary(item.averageSalary) }}</td></ng-container>
-            <ng-container matColumnDef="medianSalary"><th mat-header-cell *matHeaderCellDef>Median</th><td mat-cell *matCellDef="let item">{{ item.medianSalary === null ? 'Unavailable' : formatSalary(item.medianSalary) }}</td></ng-container>
-            <tr mat-header-row *matHeaderRowDef="breakdownColumns"></tr><tr class="clickable-row" mat-row *matRowDef="let row; columns: breakdownColumns" role="link" tabindex="0" (click)="goToFilteredEmployees('department', row.group)" (keydown)="activateDrilldown($event, 'department', row.group)"></tr>
-          </table></div>
+          <div class="chart-container" role="img" aria-label="Average salary by department chart">
+            <canvas baseChart [data]="departmentChartData()" [options]="departmentChartOptions" type="bar" (chartClick)="onDepartmentChartClick($event.active)"></canvas>
+          </div>
+          <p class="chart-hint">Select a bar to view employees in that department.</p>
         }
       </mat-card>
 
