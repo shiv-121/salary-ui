@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Employee } from '../models/employee.model';
+import { CreateEmployeeRequest, Employee } from '../models/employee.model';
 import { PageResponse } from '../models/page-response.model';
 import { Salary } from '../models/salary.model';
 import { ApiConfigService } from './api-config.service';
@@ -41,6 +41,10 @@ export class EmployeeService {
 
   getEmployee(id: number): Observable<Employee> {
     return this.http.get<Employee>(`${this.apiConfig.baseUrl}/api/employees/${id}`);
+  }
+
+  createEmployee(request: CreateEmployeeRequest): Observable<Employee> {
+    return this.http.post<Employee>(`${this.apiConfig.baseUrl}/api/employees`, request);
   }
 
   getSalaryHistory(employeeId: number): Observable<Salary[]> {

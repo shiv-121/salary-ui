@@ -4,7 +4,13 @@
     <h1>Employees</h1>
     <p class="intro">Search and review employee records across ACME.</p>
   </div>
-  <span class="total-count" aria-live="polite">{{ totalElements() }} employees</span>
+  <div class="heading-actions">
+    <span class="total-count" aria-live="polite">{{ totalElements() }} employees</span>
+    <a mat-flat-button color="primary" routerLink="/employees/new">
+      <mat-icon aria-hidden="true">person_add</mat-icon>
+      Add Employee
+    </a>
+  </div>
 </section>
 
 <mat-card appearance="outlined" class="filters-card">
