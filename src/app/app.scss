@@ -1,0 +1,77 @@
+.app-header {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	display: flex;
+	min-height: 4.25rem;
+	padding: 0 2rem;
+	background: #183b56;
+	color: #ffffff;
+	box-shadow: 0 2px 10px rgb(24 59 86 / 16%);
+}
+
+.brand {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	color: inherit;
+	font-size: 1.05rem;
+	font-weight: 650;
+	letter-spacing: 0.01em;
+	text-decoration: none;
+}
+
+.brand mat-icon {
+	color: #8ed1c2;
+}
+
+.primary-nav {
+	display: flex;
+	align-items: stretch;
+	gap: 0.35rem;
+	height: 100%;
+	margin-left: 2.25rem;
+}
+
+.primary-nav a {
+	color: #d8e8ef;
+	border-radius: 0;
+	font-size: 0.92rem;
+}
+
+.primary-nav a:hover,
+.primary-nav a.active-link {
+	color: #ffffff;
+	background: rgb(255 255 255 / 12%);
+}
+
+.app-content {
+	width: min(100% - 3rem, 78rem);
+	min-height: calc(100dvh - 4.25rem);
+	margin: 0 auto;
+	padding: 2.5rem 0 4rem;
+}
+
+@media (max-width: 600px) {
+	.app-header {
+		min-height: 7rem;
+		padding: 0.8rem 1rem;
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.brand {
+		width: 100%;
+	}
+
+	.primary-nav {
+		height: 2.5rem;
+		margin-left: -0.5rem;
+	}
+
+	.app-content {
+		width: min(100% - 2rem, 78rem);
+		min-height: calc(100dvh - 7rem);
+		padding-top: 1.5rem;
+	}
+}
