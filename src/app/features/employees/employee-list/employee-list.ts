@@ -26,7 +26,7 @@ import { Employee } from '../../../core/models/employee.model';
 import { PageResponse } from '../../../core/models/page-response.model';
 import { EmployeeQuery, EmployeeService } from '../../../core/services/employee.service';
 
-type EmployeeSortField = 'employeeCode' | 'lastName' | 'email' | 'country' | 'department' | 'jobTitle';
+type EmployeeSortField = 'employeeCode' | 'name' | 'email' | 'country' | 'department' | 'jobTitle';
 
 interface EmployeeFilterControls {
   search: FormControl<string>;
@@ -37,7 +37,7 @@ interface EmployeeFilterControls {
 
 const SORTABLE_FIELDS: readonly EmployeeSortField[] = [
   'employeeCode',
-  'lastName',
+  'name',
   'email',
   'country',
   'department',
@@ -88,7 +88,7 @@ export class EmployeeList {
   readonly totalElements = signal(0);
   readonly pageIndex = signal(0);
   readonly pageSize = signal(20);
-  readonly sortField = signal<EmployeeSortField>('lastName');
+  readonly sortField = signal<EmployeeSortField>('name');
   readonly sortDirection = signal<'asc' | 'desc'>('asc');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -163,7 +163,7 @@ export class EmployeeList {
   onSortChange(event: Sort): void {
     const field = SORTABLE_FIELDS.includes(event.active as EmployeeSortField)
       ? (event.active as EmployeeSortField)
-      : 'lastName';
+      : 'name';
     const direction = event.direction === 'desc' ? 'desc' : 'asc';
 
     this.sortField.set(field);
@@ -231,7 +231,7 @@ export class EmployeeList {
     if (SORTABLE_FIELDS.includes(field as EmployeeSortField)) {
       this.sortField.set(field as EmployeeSortField);
     } else {
-      this.sortField.set('lastName');
+      this.sortField.set('name');
     }
     this.sortDirection.set(direction === 'desc' ? 'desc' : 'asc');
   }
