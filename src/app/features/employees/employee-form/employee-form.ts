@@ -9,10 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { catchError, finalize, of } from 'rxjs';
 
-import { CreateEmployeeRequest } from '../../../core/models/employee.model';
+import { CreateEmployeeRequest, Employee } from '../../../core/models/employee.model';
 import { EmployeeService } from '../../../core/services/employee.service';
 
 interface EmployeeFormControls {
@@ -45,12 +45,17 @@ const requiredTextValidators = [Validators.required, Validators.pattern(/\S/)];
 })
 export class EmployeeForm {
   private readonly employeeService = inject(EmployeeService);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly submitting = signal(false);
+  readonly loadingEmployee = signal(false);
   readonly submitError = signal<string | null>(null);
+  readonly editEmployeeId = signal<number | null>(null);
+
+  readonly isEditMode = signal(false);
 
   readonly form = new FormGroup<EmployeeFormControls>({
     employeeCode: new FormControl('', { nonNullable: true, validators: requiredTextValidators }),
@@ -64,6 +69,15 @@ export class EmployeeForm {
     department: new FormControl('', { nonNullable: true, validators: requiredTextValidators }),
     jobTitle: new FormControl('', { nonNullable: true, validators: requiredTextValidators })
   });
+
+  ngOnInit(): void {
+    const employeeId = Number(this.route.snapshot.paramMap.get('id'));
+    if (Number.isInteger(employeeId) && employeeId > 0) {
+      this.isEditMode.set(true);
+      this.editEmployeeId.set(employeeId);
+      this.loadEmployee(employeeId);
+    }
+  }
 
   submit(): void {
     this.form.markAllAsTouched();
@@ -89,21 +103,31 @@ export class EmployeeForm {
       return;
     }
 
+    const employeeId = this.editEmployeeId();
     this.submitting.set(true);
-    this.employeeService
-      .createEmployee(request)
+    const saveRequest = employeeId === null
+      ? this.employeeService.createEmployee(request)
+      : this.employeeService.updateEmployee(employeeId, request);
+
+    saveRequest
       .pipe(
         finalize(() => this.submitting.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
         next: () => {
-          this.snackBar.open('Employee added successfully.', 'Dismiss', {
+          this.snackBar.open(
+            this.isEditMode() ? 'Employee updated successfully.' : 'Employee added successfully.',
+            'Dismiss',
+            {
             duration: 4000,
             horizontalPosition: 'end',
             verticalPosition: 'top'
-          });
-          void this.router.navigate(['/employees']);
+            }
+          );
+          void this.router.navigate(
+            this.isEditMode() && employeeId !== null ? ['/employees', employeeId] : ['/employees']
+          );
         },
         error: (error: unknown) => {
           this.submitError.set(this.getErrorMessage(error));
@@ -113,7 +137,9 @@ export class EmployeeForm {
 
   private getErrorMessage(error: unknown): string {
     if (!(error instanceof HttpErrorResponse)) {
-      return 'Unable to add employee. Please try again.';
+      return this.isEditMode()
+        ? 'Unable to update employee. Please try again.'
+        : 'Unable to add employee. Please try again.';
     }
 
     if (error.status === 0) {
@@ -123,9 +149,40 @@ export class EmployeeForm {
       return 'An employee with this code or email already exists.';
     }
     if (error.status === 400 || error.status === 422) {
-      return 'The employee details were not accepted. Check the fields and try again.';
+      return this.isEditMode()
+        ? 'The employee details were not accepted. Check the fields and try again.'
+        : 'The employee details were not accepted. Check the fields and try again.';
     }
 
-    return 'Unable to add employee. Please review the form and try again.';
+    return this.isEditMode()
+      ? 'Unable to update employee. Please review the form and try again.'
+      : 'Unable to add employee. Please review the form and try again.';
+  }
+
+  private loadEmployee(id: number): void {
+    this.loadingEmployee.set(true);
+    this.employeeService
+      .getEmployee(id)
+      .pipe(
+        catchError(() => {
+          this.submitError.set('Employee not found or unavailable.');
+          return of(null);
+        }),
+        finalize(() => this.loadingEmployee.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((employee: Employee | null) => {
+        if (employee) {
+          this.form.patchValue({
+            employeeCode: employee.employeeCode,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            email: employee.email,
+            country: employee.country,
+            department: employee.department,
+            jobTitle: employee.jobTitle
+          });
+        }
+      });
   }
 }

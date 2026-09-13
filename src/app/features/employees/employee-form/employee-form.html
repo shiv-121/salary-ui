@@ -1,12 +1,19 @@
 <section class="page-heading">
   <div>
     <p class="eyebrow">People operations</p>
-    <h1>Add Employee</h1>
-    <p class="intro">Create a new employee record for ACME.</p>
+    <h1>{{ isEditMode() ? 'Edit Employee' : 'Add Employee' }}</h1>
+    <p class="intro">{{ isEditMode() ? 'Update employee information for ACME.' : 'Create a new employee record for ACME.' }}</p>
   </div>
 </section>
 
 <mat-card appearance="outlined" class="form-card">
+  @if (loadingEmployee()) {
+    <div class="form-loading" role="status" aria-live="polite">
+      <mat-spinner diameter="32" aria-label="Loading employee"></mat-spinner>
+      <span>Loading employee...</span>
+    </div>
+  }
+
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="form-grid">
       <mat-form-field appearance="outline">
@@ -77,7 +84,7 @@
 
     <div class="form-actions">
       <a mat-stroked-button routerLink="/employees">Cancel</a>
-      <button class="primary-action" mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+      <button class="primary-action" mat-flat-button color="primary" type="submit" [disabled]="submitting() || loadingEmployee()">
         @if (submitting()) {
           <ng-container>
             <mat-spinner diameter="20" aria-label="Saving employee"></mat-spinner>
@@ -86,7 +93,7 @@
         } @else {
           <ng-container>
             <mat-icon aria-hidden="true">person_add</mat-icon>
-            <span> Add Employee</span>
+            <span>{{ isEditMode() ? 'Save Employee' : 'Add Employee' }}</span>
           </ng-container>
         }
       </button>

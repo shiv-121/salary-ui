@@ -47,6 +47,10 @@ export class EmployeeService {
     return this.http.post<Employee>(`${this.apiConfig.baseUrl}/api/employees`, request);
   }
 
+  updateEmployee(id: number, request: CreateEmployeeRequest): Observable<Employee> {
+    return this.http.put<Employee>(`${this.apiConfig.baseUrl}/api/employees/${id}`, request);
+  }
+
   getSalaryHistory(employeeId: number): Observable<Salary[]> {
     return this.http.get<Salary[]>(`${this.apiConfig.baseUrl}/api/employees/${employeeId}/salaries`);
   }

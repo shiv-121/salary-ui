@@ -32,6 +32,14 @@ export const routes: Routes = [
 					)
 			},
 			{
+				path: ':id/edit',
+				title: 'Edit Employee | ACME Salary Management',
+				loadComponent: () =>
+					import('./features/employees/employee-form/employee-form').then(
+						(module) => module.EmployeeForm
+					)
+			},
+			{
 				path: ':id',
 				title: 'Employee Details | ACME Salary Management',
 				loadComponent: () =>
